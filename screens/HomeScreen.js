@@ -12,20 +12,48 @@ export default class HomeScreen extends React.Component {
     super(props)
 
     this.state = {
-      refreshing: false
+      refreshing: true,
+      totalLinkCount: 0,
+      totalLogCount: 0,
     }
   }
 
-  onRefresh() {
-    this.setState({refreshing: true}, () => {
-      requestAnimationFrame(() => {
-        this.setState({refreshing: false})
-      })
-    })
+  async componentDidMount() {
+    this.onRefresh()
+  }
+
+  async getStatics() {
+    const response = await Promise.all([
+      fetch('https://api.h2k.co/links/count', {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }),
+      fetch('https://api.h2k.co/links/all/logs/count', {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }),
+    ])
+    let [totalLinkCount, totalLogCount] = response
+
+    return {
+      totalLinkCount: (await totalLinkCount.json()).count || 0,
+      totalLogCount:  (await totalLogCount.json()).count || 0,
+    }
+  }
+
+  async onRefresh() {
+    this.setState({refreshing: true})
+
+    const statics = await this.getStatics()
+    this.setState(Object.assign({refreshing: false}, statics))
   }
 
   render() {
-    const {refreshing} = this.state
+    const {refreshing, totalLinkCount, totalLogCount} = this.state
     return (
       <View style={styles.container}>
         <ScrollView
@@ -37,7 +65,12 @@ export default class HomeScreen extends React.Component {
             />
           }
         >
-          {refreshing ? null : <HomeMainStatic />}
+          {refreshing ? null :
+            <HomeMainStatic
+              totalLinkCount={totalLinkCount}
+              totalLogCount={totalLogCount}
+            />
+          }
         </ScrollView>
       </View>
     );

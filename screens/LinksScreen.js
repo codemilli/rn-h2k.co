@@ -7,6 +7,22 @@ export default class LinksScreen extends React.Component {
     title: 'Links',
   };
 
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      refreshing: false
+    }
+  }
+
+  onRefresh() {
+    this.setState({refreshing: true}, () => {
+      requestAnimationFrame(() => {
+        this.setState({refreshing: false})
+      })
+    })
+  }
+
   render() {
     return (
       <ScrollView style={styles.container}>

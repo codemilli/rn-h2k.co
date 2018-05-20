@@ -1,15 +1,18 @@
 import React from 'react';
 import {
   Image,
-  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 
 export class HomeMainStatic extends React.Component {
+
+  mounted = true
+
   constructor(props) {
     super(props)
+
     this.state = {
       totalLinkCount: 0,
       totalLogCount: 0,
@@ -17,26 +20,14 @@ export class HomeMainStatic extends React.Component {
   }
 
   async componentDidMount() {
-    const response = await Promise.all([
-      fetch('https://api.h2k.co/links/count', {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      }),
-      fetch('https://api.h2k.co/links/all/logs/count', {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      }),
-    ])
-    let [totalLinkCount, totalLogCount] = response
-    totalLinkCount = (await totalLinkCount.json()).count
-    totalLogCount = (await totalLogCount.json()).count
+    const {totalLinkCount, totalLogCount} = this.props
 
     this.increaseGradually('totalLinkCount', totalLinkCount, 600)
     this.increaseGradually('totalLogCount', totalLogCount, 600)
+  }
+
+  componentWillUnmount() {
+    this.mounted = false
   }
 
   increaseGradually(key, target, dur) {
@@ -45,6 +36,10 @@ export class HomeMainStatic extends React.Component {
 
     const frame = (progress) => {
       requestAnimationFrame(() => {
+        if (!this.mounted) {
+          return
+        }
+
         const timeDiff = Date.now() - start
         let progress = timeDiff / dur
         progress = progress * (progress * progress) // ease in cubic
