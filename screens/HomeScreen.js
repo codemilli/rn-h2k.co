@@ -60,11 +60,11 @@ export default class HomeScreen extends React.Component {
               style={styles.welcomeImage}
             />
           </View>
-          <View>
-            <View>
+          <View style={styles.contentWrapper}>
+            <View style={styles.cardWrapper}>
               <Text> Total Link Count : {totalLinkCount} </Text>
             </View>
-            <View>
+            <View style={styles.cardWrapper}>
               <Text> Total Log Count : {totalLogCount} </Text>
             </View>
           </View>
@@ -94,9 +94,13 @@ const styles = StyleSheet.create({
     marginTop: 3,
     marginLeft: -10,
   },
-  cardWrapper: {
+  contentWrapper: {
     flex: 1,
+    flexDirection: 'column',
     padding: 12,
-    justifyItems: 'center',
+  },
+  cardWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
   }
 });
